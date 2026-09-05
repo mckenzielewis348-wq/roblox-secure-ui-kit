@@ -1,0 +1,28 @@
+# Figma to Roblox Component Mapping
+
+This document details how design tokens and component variants in Figma map to Roblox Studio UI instances (`ScreenGui`, `Frame`, `TextLabel`, `ImageButton`).
+
+## Color Tokens & Security States
+
+| Token Name | Figma Hex | Roblox Color3 Value | Security Application |
+| :--- | :--- | :--- | :--- |
+| `Security/Critical` | `#FF4444` | `Color3.fromRGB(255, 68, 68)` | Trade warnings, ban alerts, high-risk flags |
+| `Security/Success` | `#00C851` | `Color3.fromRGB(0, 200, 81)` | Verified item badges, trade accepted |
+| `Security/Warning` | `#FFBB33` | `Color3.fromRGB(255, 187, 51)` | Input character limits, pending verification |
+| `Neutral/DarkBg` | `#1A1A1A` | `Color3.fromRGB(26, 26, 26)` | Modal dark backgrounds |
+
+---
+
+## Component Variant Logic
+
+### Component: `SecureTradeModal`
+* **`Status=Default`**: Standard 2-player trade modal layout.
+* **`Status=HighRisk`**: Toggles the visibility of the red `SafeguardPanel` frame when `TradeSecurityHandler.EvaluateRisk()` returns `true`.
+* **`Status=ItemChanged`**: Locks the Accept button state for 3 seconds when items are swapped.
+
+---
+
+## Asset Export Presets
+
+* **Icons & Badges:** Exported from Figma as `PNG 3x` or `SVG` into `assets/icons/`.
+* **Background Panels:** Slice 9-slice scalable images (`Slice` UI objects in Studio) for crisp resolution across Mobile, Desktop, and Console displays.
