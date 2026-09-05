@@ -1,0 +1,47 @@
+ocal ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local InputSanitizer = require(Shared:WaitForChild("InputSanitizer"))
+
+local TradeSecurityHandler = {}
+
+-- Server-side trade request handler
+function TradeSecurityHandler.ProcessTradeRequest(player, targetPlayer, offeredItems, requestedItems, noteText)
+    -- 1. Sanitize text input sent from the client-side Figma text frame
+    local cleanNote = InputSanitizer.Sanitize(noteText, InputSanitizer.Limits.TradeNote)
+    
+    -- 2. Verify both players are valid and connected
+    if not player or not targetPlayer or not targetPlayer:IsDescendantOf(game.Players) then
+        return false, "Invalid target player."
+    end
+
+    -- 3. Validate item ownership on the server to prevent client-side UI spoofing
+    for _, item in ipairs(offeredItems) do
+        if not TradeSecurityHandler.VerifyOwnership(player, item) then
+            warn("Security Flag: Player " .. player.Name .. " attempted to trade an unowned item.")
+            return false, "Trade validation failed: Item ownership error."
+        end
+    end
+
+    -- 4. Calculate Risk Score to trigger the Figma "HighRisk" warning variant UI
+    local isHighRisk = TradeSecurityHandler.EvaluateRisk(offeredItems, requestedItems)
+
+    return true, {
+        CleanNote = cleanNote,
+        IsHighRisk = isHighRisk
+    }
+end
+
+function TradeSecurityHandler.VerifyOwnership(player, itemData)
+    -- Server inventory check logic goes here
+    return true
+end
+
+function TradeSecurityHandler.EvaluateRisk(offered, requested)
+    -- Detect high-value disparity (e.g., offering high-tier items for zero return)
+    if #offered > 3 and #requested == 0 then
+        return true
+    end
+    return false
+end
+
+return TradeSecurityHandler
