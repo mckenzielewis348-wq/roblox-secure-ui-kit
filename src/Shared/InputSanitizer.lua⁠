@@ -1,0 +1,101 @@
+local InputSanitizer = {}
+
+-- Maximum character limits for UI text fields to prevent UI overflow and buffer issues
+InputSanitizer.Limits = {
+    PlayerName = 20,
+    TradeNote = 100,
+    ChatMessage = 250
+}
+
+-- Clean user text input before displaying in UI or sending over RemoteEvents
+function InputSanitizer.Sanitize(rawText, maxLimit)
+    if typeof(rawText) ~= "string" then
+        return ""
+    end
+
+    -- Trim whitespace
+    local cleaned = rawText:match("^%s*(.-)%s*$") or ""
+
+    -- Strip rich text tags to prevent UI injection/spoofing
+    cleaned = cleaned:gsub("<[^>]-%]", "")
+
+    -- Enforce max character length
+    if maxLimit and #cleaned > maxLimit then
+        cleaned = string.sub(cleaned, 1, maxLimit)
+    end
+
+    return cleaned
+end
+
+-- Validate numbers for trade/currency UI input boxes
+function InputSanitizer.ValidateNumericInput(rawInput, minVal, maxVal)
+    local numericValue = tonumber(rawInput)
+    if not numericValue then
+        return false, 0
+    end
+
+    -- Prevent negative numbers or fractional exploits
+    numericValue = math.floor(math.abs(numericValue))
+
+    if minVal and numericValue < minVal then
+        numericValue = minVal
+    end
+    if maxVal and numericValue > maxVal then
+        numericValue = maxVal
+    end
+
+    return true, numericValue
+end
+
+return InputSanitizer
+
+local InputSanitizer = {}
+
+-- Maximum character limits for UI text fields to prevent UI overflow and buffer issues
+InputSanitizer.Limits = {
+    PlayerName = 20,
+    TradeNote = 100,
+    ChatMessage = 250
+}
+
+-- Clean user text input before displaying in UI or sending over RemoteEvents
+function InputSanitizer.Sanitize(rawText, maxLimit)
+    if typeof(rawText) ~= "string" then
+        return ""
+    end
+
+    -- Trim whitespace
+    local cleaned = rawText:match("^%s*(.-)%s*$") or ""
+
+    -- Strip rich text tags to prevent UI injection/spoofing
+    cleaned = cleaned:gsub("<[^>]-%]", "")
+
+    -- Enforce max character length
+    if maxLimit and #cleaned > maxLimit then
+        cleaned = string.sub(cleaned, 1, maxLimit)
+    end
+
+    return cleaned
+end
+
+-- Validate numbers for trade/currency UI input boxes
+function InputSanitizer.ValidateNumericInput(rawInput, minVal, maxVal)
+    local numericValue = tonumber(rawInput)
+    if not numericValue then
+        return false, 0
+    end
+
+    -- Prevent negative numbers or fractional exploits
+    numericValue = math.floor(math.abs(numericValue))
+
+    if minVal and numericValue < minVal then
+        numericValue = minVal
+    end
+    if maxVal and numericValue > maxVal then
+        numericValue = maxVal
+    end
+
+    return true, numericValue
+end
+
+return InputSanitizer
